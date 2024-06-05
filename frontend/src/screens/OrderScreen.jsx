@@ -6,7 +6,8 @@ import { useSelector } from 'react-redux';
 import { PayPalButtons, usePayPalScriptReducer } from '@paypal/react-paypal-js'
 import Message from '../components/Message';
 import Loader from '../components/Loader';
-import { useGetOrderDetailsQuery, useGetPayPalClientIdQuery, usePayOrderMutation } from '../slices/ordersApiSlice';
+import { useGetOrderDetailsQuery, useGetPayPalClientIdQuery, 
+    usePayOrderMutation, useDeliverOrderMutation } from '../slices/ordersApiSlice';
 
 import React from 'react'
 
@@ -21,6 +22,8 @@ const OrderScreen = () => {
 
     const [{ isPending }, paypalDispatch] = usePayPalScriptReducer();
 
+    const [deliverOrder, { isLoading: loadingDeliver }] = useDeliverOrderMutation();
+    
     const { userInfo } = useSelector((state) => state.auth);
 
     useEffect(()=>{
@@ -79,6 +82,16 @@ const OrderScreen = () => {
         });
     }
 
+    const deliverOrderHandler = async () => {
+        try {
+            await deliverOrder(orderId);
+            refetch();
+            toast.success('Order delivered');
+        } catch (err) {
+            toast.error(err?.data?.message || err.message);
+        }
+    }
+
   return isLoading ? (<Loader />) : error ? (<Message variant="danger" />) : (
     <>
         <h1>Order {order._id}</h1>
@@ -132,7 +145,7 @@ const OrderScreen = () => {
                                     </Link>
                                     </Col>
                                     <Col md={4}>
-                                        {item.qty} x $.{item.price} = $.{item.qty * item.price}
+                                        {item.qty} x ${item.price} = ${item.qty * item.price}
                                     </Col>
                                 </Row>
                             </ListGroup.Item>    
@@ -149,22 +162,22 @@ const OrderScreen = () => {
                         <ListGroup.Item>
                             <Row>
                                 <Col>Items</Col>
-                                <Col>$.{order.itemsPrice}</Col>
+                                <Col>${order.itemsPrice}</Col>
                             </Row>
                             
                             <Row>
                                 <Col>Shipping</Col>
-                                <Col>$.{order.shippingPrice}</Col>
+                                <Col>${order.shippingPrice}</Col>
                             </Row>
                             
                             <Row>
                                 <Col>Tax</Col>
-                                <Col>$.{order.taxPrice}</Col>
+                                <Col>${order.taxPrice}</Col>
                             </Row>
                             
                             <Row>
                                 <Col>Total</Col>
-                                <Col>$.{order.totalPrice}</Col>
+                                <Col>${order.totalPrice}</Col>
                             </Row>
                         </ListGroup.Item>
                         
@@ -188,7 +201,17 @@ const OrderScreen = () => {
                                 )}
                             </ListGroup.Item>
                         )}
-                        {/* MARK AS DELIVERED PLACEHOLDER */}
+                        { loadingDeliver && <Loader /> }
+
+                        { userInfo && userInfo.isAdmin && order.isPaid &&
+                        !order.isDelivered && (
+                            <ListGroup.Item>
+                                <Button type='button' classname='btn btn-block'
+                                onClick={deliverOrderHandler}>
+                                    Mark As Delivered
+                                </Button>
+                            </ListGroup.Item>
+                        )}
                     </ListGroup>
                 </Card>
             </Col>
