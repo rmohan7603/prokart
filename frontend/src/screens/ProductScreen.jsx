@@ -62,9 +62,12 @@ const submitHandler = async (e) => {
 
   return (
     <>
-      <Link className="btn btn-light my-3" to="/">
+      {/* <Link className="btn btn-light my-3" to="/">
         Go Back
-      </Link>
+      </Link> */}
+      <Button className="btn btn-light my-3" onClick={() => navigate(-1)}>
+        Go Back
+      </Button>
 
       {
         isLoading?(
