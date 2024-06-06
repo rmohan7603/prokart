@@ -19,6 +19,7 @@ import Loader from "../components/Loader";
 import Message from "../components/Message";
 import { useGetProductDetailsQuery, useCreateReviewMutation } from "../slices/productsApiSlice";
 import { addToCart } from "../slices/cartSlice";
+import Meta from "../components/Meta";
 
 const ProductScreen = () => {
   const { id: productId } = useParams();
@@ -72,6 +73,7 @@ const submitHandler = async (e) => {
           <Message variant='danger'>{ error?.data?.message || error.error }</Message>
         ):(
           <>
+          <Meta title={product.name} />
         <Row>
           <Col md={5}>
             <Image src={product.image} alt={product.name} fluid />
