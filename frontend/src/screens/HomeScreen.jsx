@@ -8,6 +8,7 @@ import Message from "../components/Message";
 import { useGetProductsQuery } from "../slices/productsApiSlice";
 import Paginate from "../components/Paginate";
 import ProductCarousel from "../components/ProductCarousel";
+import Meta from '../components/Meta';
 
 const HomeScreen = () => {
 
@@ -16,6 +17,7 @@ const HomeScreen = () => {
 
   return (
     <>
+    <Meta title="Welcome to ProKart" />
     { !keyword ? (<ProductCarousel />) : (<Link to='/' className='btn btn-light mb-4'>Go Back</Link>) }
     { isLoading ? (
       <Loader/>
