@@ -10,21 +10,21 @@ import { useCreateOrderMutation } from '../slices/ordersApiSlice';
 import { clearCartItems } from '../slices/cartSlice';
 
 const PlaceOrderScreen = () => {
+  const navigate = useNavigate();
 
-    const navigate = useNavigate();
-    const dispatch = useDispatch();
-    const cart = useSelector(state => state.cart);
+  const cart = useSelector((state) => state.cart);
 
-    const [createOrder, { isLoading, error}] = useCreateOrderMutation();
+  const [createOrder, { isLoading, error }] = useCreateOrderMutation();
 
-    useEffect(()=>{
-        if(!cart.shippingAddress.address){
-            navigate('/shipping');
-        }else if(!cart.paymentMethod){
-            navigate('/payment');
-        }    
-    },[cart.paymentMethod, cart.shippingAddress.address, navigate]);
+  useEffect(() => {
+    if (!cart.shippingAddress.address) {
+      navigate('/shipping');
+    } else if (!cart.paymentMethod) {
+      navigate('/payment');
+    }
+  }, [cart.paymentMethod, cart.shippingAddress.address, navigate]);
 
+  const dispatch = useDispatch();
   const placeOrderHandler = async () => {
     try {
       const res = await createOrder({
@@ -45,16 +45,16 @@ const PlaceOrderScreen = () => {
 
   return (
     <>
-    <CheckoutSteps step1 step2 step3 step4 />
-    <Row>
+      <CheckoutSteps step1 step2 step3 step4 />
+      <Row>
         <Col md={8}>
           <ListGroup variant='flush'>
             <ListGroup.Item>
               <h2>Shipping</h2>
               <p>
                 <strong>Address:</strong>
-                {cart.shippingAddress.address}, {cart.shippingAddress.city}, 
-                {cart.shippingAddress.postalCode}, 
+                {cart.shippingAddress.address}, {cart.shippingAddress.city}{' '}
+                {cart.shippingAddress.postalCode},{' '}
                 {cart.shippingAddress.country}
               </p>
             </ListGroup.Item>
@@ -150,6 +150,6 @@ const PlaceOrderScreen = () => {
       </Row>
     </>
   );
-}
+};
 
-export default PlaceOrderScreen
+export default PlaceOrderScreen;

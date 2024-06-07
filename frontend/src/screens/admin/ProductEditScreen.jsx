@@ -8,12 +8,11 @@ import { toast } from 'react-toastify';
 import {
   useGetProductDetailsQuery,
   useUpdateProductMutation,
-  useUploadProductImageMutation
+  useUploadProductImageMutation,
 } from '../../slices/productsApiSlice';
 
 const ProductEditScreen = () => {
-
-const { id: productId } = useParams();
+  const { id: productId } = useParams();
 
   const [name, setName] = useState('');
   const [price, setPrice] = useState(0);
@@ -33,27 +32,15 @@ const { id: productId } = useParams();
   const [updateProduct, { isLoading: loadingUpdate }] =
     useUpdateProductMutation();
 
-    const [uploadProductImage, { isLoading: loadingUpload }] =
+  const [uploadProductImage, { isLoading: loadingUpload }] =
     useUploadProductImageMutation();
 
-    const navigate = useNavigate();
-
-    useEffect(() => {
-        if (product) {
-        setName(product.name);
-        setPrice(product.price);
-        setImage(product.image);
-        setBrand(product.brand);
-        setCategory(product.category);
-        setCountInStock(product.countInStock);
-        setDescription(product.description);
-    }
-  }, [product]);
-
+  const navigate = useNavigate();
 
   const submitHandler = async (e) => {
     e.preventDefault();
-      const updatedProduct = {
+    try {
+      await updateProduct({
         productId,
         name,
         price,
@@ -62,16 +49,26 @@ const { id: productId } = useParams();
         category,
         description,
         countInStock,
-      };
-      const result = await updateProduct(updatedProduct);
-      if(result.error){
-        toast.error(result.error);
-      } else {
-        toast.success('Product updated');
-        refetch();
-        navigate('/admin/productlist');
-      }
+      });
+      toast.success('Product updated');
+      refetch();
+      navigate('/admin/productlist');
+    } catch (err) {
+      toast.error(err?.data?.message || err.error);
+    }
   };
+
+  useEffect(() => {
+    if (product) {
+      setName(product.name);
+      setPrice(product.price);
+      setImage(product.image);
+      setBrand(product.brand);
+      setCategory(product.category);
+      setCountInStock(product.countInStock);
+      setDescription(product.description);
+    }
+  }, [product]);
 
   const uploadFileHandler = async (e) => {
     const formData = new FormData();
@@ -87,10 +84,10 @@ const { id: productId } = useParams();
 
   return (
     <>
-        <Link to='/admin/productlist' className='btn btn-light my-3'>
-            Go Back
-        </Link>
-        <FormContainer>
+      <Link to='/admin/productlist' className='btn btn-light my-3'>
+        Go Back
+      </Link>
+      <FormContainer>
         <h1>Edit Product</h1>
         {loadingUpdate && <Loader />}
         {isLoading ? (
@@ -98,8 +95,8 @@ const { id: productId } = useParams();
         ) : error ? (
           <Message variant='danger'>{error.data.message}</Message>
         ) : (
-          <Form onSubmit={ submitHandler }>
-            <Form.Group controlId='name' className='my-2'>
+          <Form onSubmit={submitHandler}>
+            <Form.Group controlId='name'>
               <Form.Label>Name</Form.Label>
               <Form.Control
                 type='name'
@@ -109,7 +106,7 @@ const { id: productId } = useParams();
               ></Form.Control>
             </Form.Group>
 
-            <Form.Group controlId='price' className='my-2'>
+            <Form.Group controlId='price'>
               <Form.Label>Price</Form.Label>
               <Form.Control
                 type='number'
@@ -118,7 +115,7 @@ const { id: productId } = useParams();
                 onChange={(e) => setPrice(e.target.value)}
               ></Form.Control>
             </Form.Group>
-            
+
             <Form.Group controlId='image'>
               <Form.Label>Image</Form.Label>
               <Form.Control
@@ -134,8 +131,8 @@ const { id: productId } = useParams();
               ></Form.Control>
               {loadingUpload && <Loader />}
             </Form.Group>
-        
-            <Form.Group controlId='brand' className='my-2'>
+
+            <Form.Group controlId='brand'>
               <Form.Label>Brand</Form.Label>
               <Form.Control
                 type='text'
@@ -145,7 +142,7 @@ const { id: productId } = useParams();
               ></Form.Control>
             </Form.Group>
 
-            <Form.Group controlId='countInStock' className='my-2'>
+            <Form.Group controlId='countInStock'>
               <Form.Label>Count In Stock</Form.Label>
               <Form.Control
                 type='number'
@@ -155,7 +152,7 @@ const { id: productId } = useParams();
               ></Form.Control>
             </Form.Group>
 
-            <Form.Group controlId='category' className='my-2'>
+            <Form.Group controlId='category'>
               <Form.Label>Category</Form.Label>
               <Form.Control
                 type='text'
@@ -165,7 +162,7 @@ const { id: productId } = useParams();
               ></Form.Control>
             </Form.Group>
 
-            <Form.Group controlId='description' className='my-2'>
+            <Form.Group controlId='description'>
               <Form.Label>Description</Form.Label>
               <Form.Control
                 type='text'
@@ -178,7 +175,6 @@ const { id: productId } = useParams();
             <Button
               type='submit'
               variant='primary'
-              className='my-2'
               style={{ marginTop: '1rem' }}
             >
               Update
@@ -187,7 +183,7 @@ const { id: productId } = useParams();
         )}
       </FormContainer>
     </>
-  )
-}
+  );
+};
 
-export default ProductEditScreen
+export default ProductEditScreen;
