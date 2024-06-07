@@ -9,7 +9,7 @@ import Loader from '../components/Loader';
 import {
   useDeliverOrderMutation,
   useGetOrderDetailsQuery,
-  useGetPaypalClientIdQuery,
+  useGetPayPalClientIdQuery,
   usePayOrderMutation,
 } from '../slices/ordersApiSlice';
 
@@ -36,7 +36,7 @@ const OrderScreen = () => {
     data: paypal,
     isLoading: loadingPayPal,
     error: errorPayPal,
-  } = useGetPaypalClientIdQuery();
+  } = useGetPayPalClientIdQuery();
 
   useEffect(() => {
     if (!errorPayPal && !loadingPayPal && paypal.clientId) {
